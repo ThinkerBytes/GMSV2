@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenMetrica - Carbon Footprint Calculator & Geospatial Tracker</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- ================= NAVBAR (z-[1100] to stay above map during scroll) ================= -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-[1100] shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm shadow-emerald-600/30">
+          <i class="fas fa-leaf text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">Green<span class="text-emerald-600">Metrica</span></span>
+          <span class="hidden md:inline-block ml-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>Live Monitoring
+          </span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2.5">
+        
+        <!-- Hidden file input for importing JSON -->
+        <input type="file" id="importFileInput" accept=".json" class="hidden">
+        
+        <button onclick="document.getElementById('importFileInput').click()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
+          <i class="fas fa-file-import text-slate-500"></i> Import Data
+        </button>
+
+        <button onclick="window.GreenMetricaApp.exportData()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
+          <i class="fas fa-file-export text-slate-500"></i> Export Data
+        </button>
+
+        <button onclick="window.GreenMetricaApp.openAddModal()" class="text-xs font-bold px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
+          <i class="fas fa-plus"></i> Add Entry
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-grow w-full space-y-7">
+
+    <!-- TOP 3 ANALYTICS CARDS (Styled to Pop Out) -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      
+      <!-- Card 1: Total Footprint -->
+      <div class="card-pop rounded-2xl p-6 border-t-4 border-t-emerald-500 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2.5">
+          <span>Total Carbon Footprint</span>
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="fas fa-cloud text-sm"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="metricTotal" class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-mono tracking-tight">--</span>
+          <span class="text-xs text-slate-500 font-mono font-medium">kg CO₂e</span>
+        </div>
+        <div class="mt-3 flex items-center gap-1.5 text-xs text-slate-600">
+          <i class="fas fa-database text-emerald-600 text-[11px]"></i>
+          <span id="metricTotalSub">Across reported entries</span>
+        </div>
+      </div>
+
+      <!-- Card 2: Most Cause of Emission -->
+      <div class="card-pop rounded-2xl p-6 border-t-4 border-t-amber-500 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2.5">
+          <span>Primary Emission Cause</span>
+          <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="fas fa-fire text-sm"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="metricCause" class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">--</span>
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <span id="metricCauseBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">--%</span>
+          <span id="metricCauseSub" class="text-xs text-slate-600 font-medium">of total emissions</span>
+        </div>
+      </div>
+
+      <!-- Card 3: Average per Person -->
+      <div class="card-pop rounded-2xl p-6 border-t-4 border-t-sky-500 relative overflow-hidden group">
+        <div class="flex items-center justify-between text-slate-500 text-xs font-semibold uppercase tracking-wider mb-2.5">
+          <span>Average per Person</span>
+          <div class="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center group-hover:scale-110 transition-transform">
+            <i class="fas fa-user-group text-sm"></i>
+          </div>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <span id="metricAverage" class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-mono tracking-tight">--</span>
+          <span class="text-xs text-slate-500 font-mono font-medium">kg CO₂e</span>
+        </div>
+        <div class="mt-3 flex items-center gap-2">
+          <span id="metricAvgBadge" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-sky-100 text-sky-800">Benchmark</span>
+          <span id="metricAverageSub" class="text-xs text-slate-600">India Monthly Avg: 315 kg CO₂e</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CENTRAL ATTRACTION: OPEN-SOURCE LEAFLET MAP (Pop-Out Container) -->
+    <div class="map-card-pop rounded-2xl p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
+            <i class="fas fa-map-location-dot text-sm"></i>
+          </div>
+          <div>
+            <h2 class="font-bold text-base text-slate-900">Geospatial Emission Map</h2>
+            <p id="mapActiveCount" class="text-xs text-slate-500">25 active student markers plotted</p>
+          </div>
+        </div>
+        
+        <!-- Legend Indicators -->
+        <div class="flex items-center gap-3 text-xs font-medium text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> &lt; 350 kg (Low)</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 350 - 600 kg (Mid)</span>
+          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> &gt; 600 kg (High)</span>
+        </div>
+      </div>
+
+      <!-- Leaflet Map Container: isolation: isolate ensures zero scroll overlay bugs -->
+      <div id="mapContainer" class="relative z-0 w-full h-[480px] rounded-xl overflow-hidden border border-slate-200 shadow-inner" style="isolation: isolate;"></div>
+    </div>
+
+    <!-- CHARTS SECTION: BY CATEGORY & BY COHORT (Class) -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      
+      <!-- Chart 1: By Category -->
+      <div class="card-pop rounded-2xl p-6">
+        <div class="flex items-center gap-2.5 mb-1">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <i class="fas fa-chart-pie text-xs"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Carbon Footprint by Category</h3>
+            <p class="text-xs text-slate-500">Breakdown across electricity, mobility, diet, and waste</p>
+          </div>
+        </div>
+        <div class="h-64 relative mt-3">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Chart 2: By Cohort (Class) -->
+      <div class="card-pop rounded-2xl p-6">
+        <div class="flex items-center gap-2.5 mb-1">
+          <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center">
+            <i class="fas fa-chart-bar text-xs"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-sm text-slate-900">Carbon Footprint by Cohort (Class)</h3>
+            <p class="text-xs text-slate-500">Average student monthly emissions benchmarked across classes</p>
+          </div>
+        </div>
+        <div class="h-64 relative mt-3">
+          <canvas id="cohortChart"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- DATA TABLE -->
+    <div class="card-pop rounded-2xl p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+            <i class="fas fa-list-check text-emerald-600"></i> Recorded Carbon Entries
+          </h3>
+          <p id="tableCount" class="text-xs text-slate-500">Loading records...</p>
+        </div>
+        
+        <!-- Search -->
+        <div class="relative w-full sm:w-64">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input id="searchInput" type="text" placeholder="Search name or class..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
+              <th class="py-3 px-3">#</th>
+              <th class="py-3 px-3">Name</th>
+              <th class="py-3 px-3">Class</th>
+              <th class="py-3 px-3">Coordinates</th>
+              <th class="py-3 px-3">Electricity</th>
+              <th class="py-3 px-3">Car / Bike</th>
+              <th class="py-3 px-3">LPG</th>
+              <th class="py-3 px-3">Meat / Dairy</th>
+              <th class="py-3 px-3">Total Footprint</th>
+              <th class="py-3 px-3 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-100 font-mono">
+            <!-- Populated via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= ADD / EDIT MODAL ================= -->
+  <!-- Top gap ensured with outer p-4 sm:p-6 and inner my-8 sm:my-12 -->
+  <div id="entryModal" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-xs hidden overflow-y-auto p-4 sm:p-6">
+    <div class="relative mx-auto my-8 sm:my-12 max-w-lg w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl text-slate-800">
+      
+      <!-- Close button -->
+      <button onclick="window.GreenMetricaApp.closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+        <i class="fas fa-times text-base"></i>
+      </button>
+
+      <h3 id="modalTitle" class="text-xl font-bold text-center text-slate-900">Carbon Footprint Calculator</h3>
+      <p class="text-xs text-center text-slate-500 mt-1 mb-4">Choose all the parameters that are applicable for you.</p>
+
+      <!-- Parameter Buttons with Icons (Exact as in GitHub repo) -->
+      <div class="space-y-2 mb-4">
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" id="btnParam_electricity" onclick="window.GreenMetricaApp.toggleParameter('electricity')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-bolt text-amber-500"></i> Electricity
+          </button>
+          <button type="button" id="btnParam_car" onclick="window.GreenMetricaApp.toggleParameter('car')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-car text-blue-500"></i> Car
+          </button>
+          <button type="button" id="btnParam_bike" onclick="window.GreenMetricaApp.toggleParameter('bike')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-bicycle text-emerald-500"></i> Bike
+          </button>
+        </div>
+
+        <div class="grid grid-cols-3 gap-2">
+          <button type="button" id="btnParam_meat" onclick="window.GreenMetricaApp.toggleParameter('meat')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-drumstick-bite text-rose-500"></i> Meat
+          </button>
+          <button type="button" id="btnParam_dairy" onclick="window.GreenMetricaApp.toggleParameter('dairy')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-cheese text-amber-500"></i> Dairy
+          </button>
+          <button type="button" id="btnParam_otherFood" onclick="window.GreenMetricaApp.toggleParameter('otherFood')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-utensils text-orange-500"></i> LPG
+          </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-2">
+          <button type="button" id="btnParam_waste" onclick="window.GreenMetricaApp.toggleParameter('waste')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-trash text-slate-600"></i> Waste
+          </button>
+          <button type="button" id="btnParam_recycling" onclick="window.GreenMetricaApp.toggleParameter('recycling')" class="param-btn py-2 px-2 text-xs font-semibold rounded-lg border border-slate-200 bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center justify-center gap-1.5">
+            <i class="fas fa-recycle text-emerald-600"></i> Recycling
+          </button>
+        </div>
+      </div>
+
+      <hr class="border-slate-200 my-4">
+
+      <!-- Form Inputs (No pre-filled values) -->
+      <form id="carbonForm" class="space-y-3.5 text-xs">
+
+        <!-- User Info & Coordinates (Lat/Lng only, with browser location capture) -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Name *</label>
+            <input id="userName" type="text" required placeholder="Enter name" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-emerald-500">
+          </div>
+          <div>
+            <label class="block font-semibold text-slate-700 mb-1">Class *</label>
+            <input id="userClass" type="text" required placeholder="e.g. IX D" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-slate-900 focus:outline-none focus:border-emerald-500">
+          </div>
+        </div>
+
+        <!-- Coordinates capture (Available in both Add and Edit modes) -->
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-semibold text-slate-700">Location Coordinates *</label>
+            <button type="button" onclick="window.GreenMetricaApp.useCurrentLocation()" class="text-[11px] font-semibold text-emerald-700 hover:text-emerald-800 flex items-center gap-1 transition">
+              <i class="fas fa-location-crosshairs text-emerald-600"></i> Get Browser Location
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-3 font-mono">
+            <div>
+              <span class="text-[10px] text-slate-500 font-sans block mb-0.5">Latitude:</span>
+              <input id="userLat" type="number" step="0.0001" required placeholder="e.g. 10.7867" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs">
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 font-sans block mb-0.5">Longitude:</span>
+              <input id="userLng" type="number" step="0.0001" required placeholder="e.g. 76.6548" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs">
+            </div>
+          </div>
+        </div>
+
+        <!-- Parameter Input Groups (Only selected item is visible at a time) -->
+
+        <!-- Electricity Form Group -->
+        <div id="electricityForm" class="param-group hidden p-3.5 rounded-xl bg-amber-50/50 border border-amber-200">
+          <label class="block font-semibold text-slate-700 mb-1">Electricity Consumption (kWh)</label>
+          <input id="electricityConsumption" type="number" step="0.1" min="0" placeholder="Enter electricity in kWh" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+        </div>
+
+        <!-- Car Form Group -->
+        <div id="carForm" class="param-group hidden p-3.5 rounded-xl bg-blue-50/50 border border-blue-200 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="font-semibold text-slate-700">Car Travel</label>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-500">Fuel:</span>
+              <select id="carFuel" class="bg-white border border-slate-300 text-slate-700 rounded px-2 py-0.5 text-xs">
+                <option value="petrol">Petrol</option>
+                <option value="diesel">Diesel</option>
+              </select>
+            </div>
+          </div>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-[10px] text-slate-500 block mb-0.5">Distance (km):</span>
+              <input id="carDistance" type="number" step="0.1" min="0" placeholder="Enter distance" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 block mb-0.5">Mileage (km/liter):</span>
+              <input id="carMileage" type="number" step="0.1" min="0" placeholder="Enter mileage" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+            </div>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-500 block mb-0.5">Or direct fuel consumed (Liters):</span>
+            <input id="carLiters" type="number" step="0.1" min="0" placeholder="Enter car fuel in liters" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+          </div>
+        </div>
+
+        <!-- Bike Form Group -->
+        <div id="bikeForm" class="param-group hidden p-3.5 rounded-xl bg-emerald-50/50 border border-emerald-200 space-y-2">
+          <label class="block font-semibold text-slate-700">Bike Travel</label>
+          <div class="grid grid-cols-2 gap-2">
+            <div>
+              <span class="text-[10px] text-slate-500 block mb-0.5">Distance (km):</span>
+              <input id="bikeDistance" type="number" step="0.1" min="0" placeholder="Enter distance" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+            </div>
+            <div>
+              <span class="text-[10px] text-slate-500 block mb-0.5">Mileage (km/liter):</span>
+              <input id="bikeMileage" type="number" step="0.1" min="0" placeholder="Enter mileage" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+            </div>
+          </div>
+          <div>
+            <span class="text-[10px] text-slate-500 block mb-0.5">Or direct fuel consumed (Liters):</span>
+            <input id="bikeLiters" type="number" step="0.1" min="0" placeholder="Enter bike fuel in liters" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+          </div>
+        </div>
+
+        <!-- Meat Form Group -->
+        <div id="meatForm" class="param-group hidden p-3.5 rounded-xl bg-rose-50/50 border border-rose-200">
+          <label class="block font-semibold text-slate-700 mb-1">Meat Consumption (kg)</label>
+          <input id="meatConsumption" type="number" step="0.1" min="0" placeholder="Enter meat in kg" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+        </div>
+
+        <!-- Dairy Form Group -->
+        <div id="dairyForm" class="param-group hidden p-3.5 rounded-xl bg-amber-50/50 border border-amber-200">
+          <label class="block font-semibold text-slate-700 mb-1">Dairy Consumption (kg)</label>
+          <input id="dairyConsumption" type="number" step="0.1" min="0" placeholder="Enter dairy in kg" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+        </div>
+
+        <!-- LPG Form Group -->
+        <div id="otherFoodForm" class="param-group hidden p-3.5 rounded-xl bg-orange-50/50 border border-orange-200">
+          <label class="block font-semibold text-slate-700 mb-1">LPG (kg)</label>
+          <input id="otherFoodConsumption" type="number" step="0.1" min="0" placeholder="Enter LPG in kg" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+        </div>
+
+        <!-- Waste Form Group -->
+        <div id="wasteForm" class="param-group hidden p-3.5 rounded-xl bg-slate-100 border border-slate-300">
+          <label class="block font-semibold text-slate-700 mb-1">Solid Waste Generation (kg)</label>
+          <input id="wasteGeneration" type="number" step="0.1" min="0" placeholder="Enter waste in kg" class="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-slate-900 font-mono">
+        </div>
+
+        <!-- Recycling Form Group -->
+        <div id="recyclingForm" class="param-group hidden p-3.5 rounded-xl bg-emerald-50 border border-emerald-300">
+          <label class="block font-semibold text-emerald-800 mb-1">Recycling Amount (kg)</label>
+          <input id="recyclingAmount" type="number" step="0.1" min="0" placeholder="Enter recycling in kg" class="w-full px-3 py-2 bg-white border border-emerald-300 rounded-lg text-emerald-800 font-mono">
+        </div>
+
+        <!-- Live Footprint Display -->
+        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 flex items-center justify-between">
+          <span class="font-semibold text-slate-700">Calculated Footprint:</span>
+          <span id="formLiveTotal" class="text-base font-extrabold text-emerald-600 font-mono">0.00 kg CO₂e</span>
+        </div>
+
+        <div class="pt-3 border-t border-slate-200 flex justify-end gap-2.5">
+          <button type="button" onclick="window.GreenMetricaApp.closeModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg font-medium transition">
+            Cancel
+          </button>
+          <button type="submit" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg font-bold transition shadow-sm shadow-emerald-600/30">
+            Calculate & Save Entry
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 z-[10000] hidden bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition"></div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    GreenMetrica &bull; Carbon Footprint Calculator & Geospatial Tracker
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
