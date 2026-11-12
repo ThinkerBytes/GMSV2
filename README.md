@@ -2,7 +2,7 @@
 
 GreenMetrica is a clean, modern web application designed to calculate, track, and geospatially visualize carbon footprints on an open-source **Leaflet Map**.
 
-The calculation engine uses the exact formulas from [Ajinkj/CFPC](https://github.com/Ajinkj/CFPC) and is preloaded with the **Green Metrica Monthly Carbon Summary** (25 student records).
+The calculation engine uses the exact formulas from [Ajinkj/CFPC](https://github.com/Ajinkj/CFPC) and is preloaded with the **Green Metrica Monthly Carbon Summary** (25 student records organically clustered around `Lat: 10.9069, Lng: 76.4094`).
 
 ---
 
@@ -34,8 +34,8 @@ $$\text{Net Emission (kg CO}_2\text{e)} = \sum \text{Gross Emissions} - (\text{R
    - **Average per Person:** Dynamic per-student average benchmarked against India's monthly baseline ($315\text{ kg CO}_2\text{e}$).
 2. **Interactive Leaflet Map**:
    - Free, open-source OpenStreetMap tiles (no API keys required).
-   - Centered on coordinates `(10.7867, 76.6548)`.
-   - 25 student records situated organically across residential communities.
+   - Centered around `(10.9069, 76.4094)`.
+   - 25 student records situated organically with randomized scatter across residential communities (no patterns or lines).
    - Colored by emission intensity (Green: <350 kg, Amber: 350-600 kg, Coral Red: >600 kg).
    - Minimal popups showing only Name, Class, and Total Footprint.
    - Fixed anchor positioning with zero drift on zooming.
@@ -43,16 +43,17 @@ $$\text{Net Emission (kg CO}_2\text{e)} = \sum \text{Gross Emissions} - (\text{R
 3. **Interactive Charts**:
    - **Carbon Footprint by Category** (Donut chart).
    - **Carbon Footprint by Cohort** (Class IX, X, XI, XII comparison bar chart).
-4. **Interactive Form (Identical to GitHub Repo Format)**:
-   - Click parameter icon buttons (`Electricity`, `Car`, `Bike`, `Meat`, `Dairy`, `LPG`, `Waste`, `Recycling`) to reveal only that parameter's input fields.
-   - Values are **not pre-filled** (starts empty with clear placeholders).
-   - Clean fuel toggle (Petrol and Diesel options without numbers).
-   - **Browser Geolocation:** Click "Get Browser Location" to grab current GPS coordinates without external APIs, or enter coordinates manually (available in both Add and Edit modes).
-   - Real-time live calculation of total footprint.
-5. **Data Management & Cache**:
-   - All records are saved to `localStorage`, so page refresh does not lose any entries.
-   - **Export Data** downloads a `.json` backup.
-   - **Import Data** populates the app from any JSON file.
+4. **Excel Import & Export (Home Dashboard)**:
+   - **Import Excel Modal:** Clicking "Import Excel" opens a modal containing:
+     - **Sample Excel Template Download:** `GreenMetrica_Student_Template.xlsx` containing the exact column structure and the 25 current students.
+     - **Upload Zone:** Drop or browse `.xlsx` / `.xls` files. Users can add more students and upload directly.
+   - **Export Excel:** Downloads `GreenMetrica_Emissions_[DATE].xlsx` with all student inputs, coordinates, plus calculated carbon footprints, emission breakdowns, and tiers.
+5. **Administration Page (`/admin.html` or `/admin`)**:
+   - **Full Database JSON Export:** Download raw database backup including nested objects.
+   - **Full Database JSON Import:** Restore database from `.json` backups.
+   - **Reset to 25 Default Records:** Re-seed standard dataset centered around `(10.9069, 76.4094)`.
+   - **Clear Database:** Empty all entries.
+   - **Live Database Inspector:** Search and delete individual records.
 
 ---
 
@@ -61,4 +62,5 @@ $$\text{Net Emission (kg CO}_2\text{e)} = \sum \text{Gross Emissions} - (\text{R
 ```powershell
 python -m http.server 8080
 ```
-Open `http://localhost:8080/` in any web browser.
+- Open `http://localhost:8080/` in any web browser for the Main Dashboard.
+- Open `http://localhost:8080/admin.html` (or `http://localhost:8080/admin`) for the Admin Console.

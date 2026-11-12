@@ -2,11 +2,15 @@
  * GreenMetrica - Streamlined Carbon Footprint Calculator & Geospatial Tracker
  */
 
+const STORAGE_KEY = 'greenmetrica_entries_v7';
+const DEFAULT_CENTER = [10.9069, 76.4094];
+
 class GreenMetricaApp {
   constructor() {
     this.entries = [];
     this.filteredEntries = [];
     this.currentEditingId = null;
+    this.pendingExcelRows = null;
 
     // Map & Charts
     this.map = null;
@@ -26,7 +30,6 @@ class GreenMetricaApp {
 
   /* ================= LOCAL STORAGE & CACHE ================= */
   loadData() {
-    const STORAGE_KEY = 'greenmetrica_entries_v6';
     const stored = localStorage.getItem(STORAGE_KEY);
 
     if (stored) {
@@ -43,40 +46,20 @@ class GreenMetricaApp {
       } catch (e) {}
     }
 
-    // Check older caches to preserve any custom user-added records
-    let userCreatedEntries = [];
-    const olderKeys = ['greenmetrica_entries_v5', 'greenmetrica_entries_v4', 'greenmetrica_entries_v3', 'greenmetrica_entries_v2', 'greenmetrica_entries'];
-    for (const key of olderKeys) {
-      const oldRaw = localStorage.getItem(key);
-      if (oldRaw) {
-        try {
-          const parsed = JSON.parse(oldRaw);
-          if (Array.isArray(parsed)) {
-            // Retain entries that were manually added by the user
-            const custom = parsed.filter(e => e.id && !e.id.match(/^gm-(0[1-9]|1[0-9]|2[0-5])$/));
-            if (custom.length > 0) {
-              userCreatedEntries = custom;
-              break;
-            }
-          }
-        } catch (e) {}
-      }
-    }
+    // Initialize with verified 25 student records centered around (10.9069, 76.4094)
+    this.seedInitialData();
+  }
 
-    // Seed verified 25 student records
-    const defaultData = INITIAL_STUDENT_DATA.map(item => {
+  seedInitialData() {
+    this.entries = INITIAL_STUDENT_DATA.map(item => {
       const calc = calculateEmissionBreakdown(item);
       return { ...item, ...calc };
     });
-
-    // Merge default entries with any user custom entries
-    this.entries = [...userCreatedEntries.map(e => ({ ...e, ...calculateEmissionBreakdown(e) })), ...defaultData];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(this.entries));
     this.filteredEntries = [...this.entries];
   }
 
   saveData() {
-    const STORAGE_KEY = 'greenmetrica_entries_v6';
     localStorage.setItem(STORAGE_KEY, JSON.stringify(this.entries));
     this.filteredEntries = [...this.entries];
     this.updateDashboard();
@@ -85,8 +68,293 @@ class GreenMetricaApp {
     this.renderTable();
   }
 
-  /* ================= EXPORT & IMPORT ================= */
-  exportData() {
+  /* ================= EXCEL TEMPLATE & EXPORT ================= */
+  downloadExcelTemplate() {
+    if (typeof XLSX === 'undefined') {
+      alert('Excel library is loading, please try again in a moment.');
+      return;
+    }
+
+    // Build template using the 25 student records
+    const templateRows = INITIAL_STUDENT_DATA.map((s, idx) => ({
+      'SL No': idx + 1,
+      'Name': s.name,
+      'Class': s.class,
+      'Latitude': s.lat,
+      'Longitude': s.lng,
+      'Electricity (kWh)': s.electricity,
+      'Solar': s.solar ? 'Yes' : 'No',
+      'Car Fuel (Liters)': s.car || s.carLiters || 0,
+      'Car Fuel Type': (s.carFuelType || 'Petrol').toUpperCase(),
+      'Bike Fuel (Liters)': s.bike || s.bikeLiters || 0,
+      'LPG (kg)': s.lpg || 0,
+      'Meat (kg)': s.meat || 0,
+      'Dairy (kg)': s.dairy || 0,
+      'Solid Waste (kg)': s.waste || 0,
+      'Recycling (kg)': s.recycling || 0
+    }));
+
+    const ws = XLSX.utils.json_to_sheet(templateRows);
+
+    // Auto-fit column widths
+    ws['!cols'] = [
+      { wch: 8 },  // SL No
+      { wch: 24 }, // Name
+      { wch: 10 }, // Class
+      { wch: 12 }, // Latitude
+      { wch: 12 }, // Longitude
+      { wch: 18 }, // Electricity
+      { wch: 8 },  // Solar
+      { wch: 16 }, // Car Fuel
+      { wch: 14 }, // Car Fuel Type
+      { wch: 16 }, // Bike Fuel
+      { wch: 10 }, // LPG
+      { wch: 10 }, // Meat
+      { wch: 10 }, // Dairy
+      { wch: 16 }, // Solid Waste
+      { wch: 14 }  // Recycling
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Student Template');
+    XLSX.writeFile(wb, 'GreenMetrica_Student_Template.xlsx');
+    this.showToast('Downloaded sample Excel template.');
+  }
+
+  exportExcel() {
+    if (typeof XLSX === 'undefined') {
+      alert('Excel library is loading, please try again in a moment.');
+      return;
+    }
+    if (this.entries.length === 0) {
+      this.showToast('No entries to export.');
+      return;
+    }
+
+    const exportRows = this.entries.map((s, idx) => {
+      const calc = s.breakdown ? s : calculateEmissionBreakdown(s);
+      return {
+        'SL No': idx + 1,
+        'Name': s.name,
+        'Class': s.class,
+        'Latitude': parseFloat(s.lat) || DEFAULT_CENTER[0],
+        'Longitude': parseFloat(s.lng) || DEFAULT_CENTER[1],
+        'Electricity (kWh)': s.electricity || 0,
+        'Solar': s.solar || s.isSolar ? 'Yes' : 'No',
+        'Car Fuel (Liters)': s.carLiters || s.car || 0,
+        'Car Fuel Type': (s.carFuelType || 'Petrol').toUpperCase(),
+        'Bike Fuel (Liters)': s.bikeLiters || s.bike || 0,
+        'LPG (kg)': s.lpg || 0,
+        'Meat (kg)': s.meat || 0,
+        'Dairy (kg)': s.dairy || 0,
+        'Solid Waste (kg)': s.waste || 0,
+        'Recycling (kg)': s.recycling || 0,
+
+        // Calculated Emission Results
+        'Total Footprint (kg CO2e)': parseFloat(calc.totalEmission.toFixed(2)),
+        'Emission Tier': calc.tierLabel || (calc.totalEmission < 350 ? 'Low' : calc.totalEmission > 600 ? 'High' : 'Moderate'),
+        'Electricity Emission (kg CO2e)': calc.breakdown.electricity,
+        'Car Emission (kg CO2e)': calc.breakdown.car,
+        'Bike Emission (kg CO2e)': calc.breakdown.bike,
+        'LPG Emission (kg CO2e)': calc.breakdown.lpg,
+        'Meat Emission (kg CO2e)': calc.breakdown.meat,
+        'Dairy Emission (kg CO2e)': calc.breakdown.dairy,
+        'Waste Emission (kg CO2e)': calc.breakdown.waste,
+        'Recycling Offset (kg CO2e)': calc.breakdown.recycling
+      };
+    });
+
+    const ws = XLSX.utils.json_to_sheet(exportRows);
+    ws['!cols'] = [
+      { wch: 8 },  // SL No
+      { wch: 24 }, // Name
+      { wch: 10 }, // Class
+      { wch: 12 }, // Latitude
+      { wch: 12 }, // Longitude
+      { wch: 18 }, // Electricity
+      { wch: 8 },  // Solar
+      { wch: 16 }, // Car Fuel
+      { wch: 14 }, // Car Fuel Type
+      { wch: 16 }, // Bike Fuel
+      { wch: 10 }, // LPG
+      { wch: 10 }, // Meat
+      { wch: 10 }, // Dairy
+      { wch: 16 }, // Solid Waste
+      { wch: 14 }, // Recycling
+      { wch: 26 }, // Total Footprint
+      { wch: 14 }, // Tier
+      { wch: 26 }, // Electricity Emission
+      { wch: 22 }, // Car Emission
+      { wch: 22 }, // Bike Emission
+      { wch: 22 }, // LPG Emission
+      { wch: 22 }, // Meat Emission
+      { wch: 22 }, // Dairy Emission
+      { wch: 24 }, // Waste Emission
+      { wch: 24 }  // Recycling Offset
+    ];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Emissions Summary');
+    const filename = `GreenMetrica_Emissions_${new Date().toISOString().slice(0, 10)}.xlsx`;
+    XLSX.writeFile(wb, filename);
+    this.showToast(`Exported ${this.entries.length} student records to Excel.`);
+  }
+
+  /* ================= EXCEL IMPORT MODAL & HANDLER ================= */
+  openImportExcelModal() {
+    const modal = document.getElementById('excelImportModal');
+    if (modal) {
+      modal.classList.remove('hidden');
+      const fileInput = document.getElementById('excelFileInput');
+      if (fileInput) fileInput.value = '';
+      const preview = document.getElementById('excelFilePreview');
+      if (preview) preview.classList.add('hidden');
+      const btn = document.getElementById('btnConfirmExcelImport');
+      if (btn) btn.disabled = true;
+    }
+  }
+
+  closeImportExcelModal() {
+    const modal = document.getElementById('excelImportModal');
+    if (modal) modal.classList.add('hidden');
+    this.pendingExcelRows = null;
+  }
+
+  handleExcelFileSelect(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+
+    if (typeof XLSX === 'undefined') {
+      alert('Excel library is loading, please try again.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const sheet = workbook.Sheets[sheetName];
+        const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+
+        if (!rows || rows.length === 0) {
+          alert('Uploaded Excel sheet is empty. Please check the file.');
+          return;
+        }
+
+        this.pendingExcelRows = rows;
+
+        // Show file preview
+        const preview = document.getElementById('excelFilePreview');
+        const filenameEl = document.getElementById('excelPreviewFilename');
+        const rowCountEl = document.getElementById('excelPreviewRowCount');
+        const btn = document.getElementById('btnConfirmExcelImport');
+
+        if (preview && filenameEl && rowCountEl) {
+          filenameEl.textContent = file.name;
+          rowCountEl.textContent = `${rows.length} student rows detected`;
+          preview.classList.remove('hidden');
+        }
+        if (btn) btn.disabled = false;
+      } catch (err) {
+        alert('Could not parse Excel file: ' + err.message);
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  confirmExcelImport() {
+    if (!this.pendingExcelRows || this.pendingExcelRows.length === 0) {
+      alert('Please select a valid Excel file first.');
+      return;
+    }
+
+    const imported = [];
+    this.pendingExcelRows.forEach((row, idx) => {
+      // Find row keys flexibly
+      const getVal = (...keys) => {
+        for (const k of keys) {
+          if (row[k] !== undefined && row[k] !== '') return row[k];
+          for (const actualKey of Object.keys(row)) {
+            if (actualKey.trim().toLowerCase() === k.trim().toLowerCase() && row[actualKey] !== '') {
+              return row[actualKey];
+            }
+          }
+        }
+        return '';
+      };
+
+      const name = getVal('Name', 'Student Name', 'Student', 'NAME') || `Student ${idx + 1}`;
+      const cls = getVal('Class', 'Grade', 'CLASS') || 'General';
+
+      // Parse coordinates or assign organic random scatter around (10.9069, 76.4094)
+      let lat = parseFloat(getVal('Latitude', 'Lat', 'LATITUDE', 'lat'));
+      let lng = parseFloat(getVal('Longitude', 'Lng', 'Long', 'LONGITUDE', 'lng'));
+      if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) {
+        const rAng = Math.random() * Math.PI * 2;
+        const rDist = 0.4 + Math.random() * 2.2;
+        lat = parseFloat((DEFAULT_CENTER[0] + (rDist * Math.cos(rAng)) / 111.0).toFixed(4));
+        lng = parseFloat((DEFAULT_CENTER[1] + (rDist * Math.sin(rAng)) / (111.0 * Math.cos(DEFAULT_CENTER[0] * Math.PI / 180))).toFixed(4));
+      }
+
+      const elec = parseFloat(getVal('Electricity (kWh)', 'Electricity', 'ELECTRICITY', 'Elec (kWh)')) || 0;
+      const solarVal = String(getVal('Solar', 'SOLAR', 'Is Solar')).toLowerCase();
+      const isSolar = solarVal === 'yes' || solarVal === 'true' || solarVal === '1';
+
+      const car = parseFloat(getVal('Car Fuel (Liters)', 'Car', 'Car (Ltrs)', 'Car Fuel')) || 0;
+      const carFuelType = String(getVal('Car Fuel Type', 'Fuel Type', 'Fuel', 'Car Type')).toLowerCase().includes('diesel') ? 'diesel' : 'petrol';
+
+      const bike = parseFloat(getVal('Bike Fuel (Liters)', 'Bike', 'Bike (Ltrs)', 'Bike Fuel')) || 0;
+      const lpg = parseFloat(getVal('LPG (kg)', 'LPG', 'LPG (KG)')) || 0;
+      const meat = parseFloat(getVal('Meat (kg)', 'Meat', 'MEAT')) || 0;
+      const dairy = parseFloat(getVal('Dairy (kg)', 'Dairy', 'DAIRY')) || 0;
+      const waste = parseFloat(getVal('Solid Waste (kg)', 'Waste (kg)', 'Waste', 'WASTE')) || 0;
+      const recycling = parseFloat(getVal('Recycling (kg)', 'Recycling', 'RECYCLING')) || 0;
+      const otherFood = parseFloat(getVal('Other Food (kg)', 'Other Food')) || 0;
+
+      const rawItem = {
+        id: 'gm-xl-' + Date.now() + '-' + idx,
+        no: idx + 1,
+        name: String(name).trim(),
+        class: String(cls).trim(),
+        lat: lat,
+        lng: lng,
+        electricity: elec,
+        solar: isSolar,
+        car: car,
+        carLiters: car,
+        carFuelType: carFuelType,
+        bike: bike,
+        bikeLiters: bike,
+        lpg: lpg,
+        meat: meat,
+        dairy: dairy,
+        waste: waste,
+        recycling: recycling,
+        otherFood: otherFood
+      };
+
+      const calc = calculateEmissionBreakdown(rawItem);
+      imported.push({ ...rawItem, ...calc });
+    });
+
+    if (imported.length === 0) {
+      alert('Could not extract any student records from the Excel file.');
+      return;
+    }
+
+    this.entries = imported;
+    this.saveData();
+    this.closeImportExcelModal();
+    if (this.map) {
+      this.renderMapMarkers(true);
+    }
+    this.showToast(`Successfully imported & plotted ${imported.length} student records!`);
+  }
+
+  /* ================= JSON EXPORT & IMPORT (FOR ADMIN) ================= */
+  exportJSON() {
     if (this.entries.length === 0) {
       this.showToast('No entries to export.');
       return;
@@ -98,10 +366,15 @@ class GreenMetricaApp {
     document.body.appendChild(downloadAnchor);
     downloadAnchor.click();
     downloadAnchor.remove();
-    this.showToast('Exported dataset successfully.');
+    this.showToast('Exported complete JSON database.');
   }
 
-  handleImportFile(event) {
+  // Alias for backward compatibility
+  exportData() {
+    this.exportJSON();
+  }
+
+  handleImportJSON(event) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
 
@@ -120,8 +393,8 @@ class GreenMetricaApp {
             id: item.id || 'gm-' + Date.now() + '-' + idx,
             name: item.name || 'Student',
             class: item.class || 'N/A',
-            lat: parseFloat(item.lat) || 10.7867,
-            lng: parseFloat(item.lng) || 76.6548,
+            lat: parseFloat(item.lat) || DEFAULT_CENTER[0],
+            lng: parseFloat(item.lng) || DEFAULT_CENTER[1],
             electricity: parseFloat(item.electricity) || 0,
             solar: Boolean(item.solar),
             car: parseFloat(item.car) || parseFloat(item.carLiters) || 0,
@@ -144,7 +417,7 @@ class GreenMetricaApp {
         });
 
         this.saveData();
-        this.showToast(`Imported ${this.entries.length} entries successfully!`);
+        this.showToast(`Imported ${this.entries.length} entries from JSON!`);
       } catch (err) {
         alert('Could not read JSON file: ' + err.message);
       }
@@ -153,15 +426,39 @@ class GreenMetricaApp {
     reader.readAsText(file);
   }
 
+  // Alias
+  handleImportFile(event) {
+    this.handleImportJSON(event);
+  }
+
+  resetToDefaultData() {
+    if (confirm('Reset database to the 25 default verified student records?')) {
+      this.seedInitialData();
+      this.updateDashboard();
+      this.renderMapMarkers(true);
+      this.renderCharts();
+      this.renderTable();
+      this.showToast('Database reset to 25 default records.');
+    }
+  }
+
+  clearAllData() {
+    if (confirm('Are you sure you want to delete ALL records? This cannot be undone.')) {
+      this.entries = [];
+      this.saveData();
+      this.showToast('All records cleared.');
+    }
+  }
+
   /* ================= FREE OPENSTREETMAP LEAFLET MAP ================= */
   initMap() {
     const mapEl = document.getElementById('mapContainer');
     if (!mapEl) return;
 
-    // Centered on the student community cluster (Lat: 10.7867, Lng: 76.6548)
+    // Centered on the student community cluster (Lat: 10.9069, Lng: 76.4094)
     this.map = L.map('mapContainer', {
-      center: [10.7867, 76.6548],
-      zoom: 13,
+      center: DEFAULT_CENTER,
+      zoom: 14,
       zoomControl: true
     });
 
@@ -210,7 +507,7 @@ class GreenMetricaApp {
 
       const marker = L.marker([lat, lng], { icon: customIcon });
 
-      // Clean, minimal popup showing only name, class, and emission data as requested
+      // Clean, minimal popup showing only name, class, and emission data
       const popupHtml = `
         <div style="font-family: sans-serif; padding: 4px 6px; text-align: center; color: #0f172a; min-width: 130px;">
           <div style="font-weight: 700; font-size: 13px; color: #0f172a; margin-bottom: 2px;">${entry.name}</div>
@@ -228,7 +525,7 @@ class GreenMetricaApp {
 
     if (shouldFitBounds && bounds.length > 0) {
       try {
-        this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
       } catch (e) {}
     }
   }
@@ -237,7 +534,7 @@ class GreenMetricaApp {
     const entry = this.entries.find(e => e.id === id);
     if (!entry || !this.map) return;
 
-    this.map.flyTo([entry.lat, entry.lng], 14, { duration: 1.0 });
+    this.map.flyTo([entry.lat, entry.lng], 15, { duration: 1.0 });
     document.getElementById('mapContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
 
     this.markersLayer.eachLayer(layer => {
@@ -515,7 +812,6 @@ class GreenMetricaApp {
   }
 
   /* ================= REPO-STYLE PARAMETER TOGGLE ================= */
-  // Shows ONLY the selected item's field, removes previous selected item's field view
   toggleParameter(param) {
     const params = ['electricity', 'car', 'bike', 'meat', 'dairy', 'otherFood', 'waste', 'recycling'];
 
@@ -560,7 +856,7 @@ class GreenMetricaApp {
       }
     });
 
-    // Inputs start completely empty (NOT pre-filled!)
+    // Inputs start completely empty
     document.getElementById('userName').value = '';
     document.getElementById('userClass').value = '';
     document.getElementById('userLat').value = '';
@@ -654,8 +950,8 @@ class GreenMetricaApp {
     return {
       name: document.getElementById('userName').value.trim() || 'Student',
       class: document.getElementById('userClass').value.trim() || 'General',
-      lat: parseFloat(document.getElementById('userLat').value) || 10.7867,
-      lng: parseFloat(document.getElementById('userLng').value) || 76.6548,
+      lat: parseFloat(document.getElementById('userLat').value) || DEFAULT_CENTER[0],
+      lng: parseFloat(document.getElementById('userLng').value) || DEFAULT_CENTER[1],
       electricity: parseFloat(document.getElementById('electricityConsumption').value) || 0,
       carLiters: carLiters,
       carDistance: carDist,
@@ -709,7 +1005,7 @@ class GreenMetricaApp {
     this.closeModal();
 
     if (this.map) {
-      this.map.flyTo([item.lat, item.lng], 14, { duration: 1.0 });
+      this.map.flyTo([item.lat, item.lng], 15, { duration: 1.0 });
     }
   }
 
@@ -717,15 +1013,15 @@ class GreenMetricaApp {
     const item = this.entries.find(e => e.id === id);
     if (!item) return;
 
-    if (confirm(`Delete emission record for ${item.name}?`)) {
-      this.entries = this.entries.filter(e => e.id !== id);
-      this.saveData();
-      this.showToast(`Deleted ${item.name}`);
+    if (typeof window !== 'undefined' && window.confirm && !window.confirm(`Delete emission record for ${item.name}?`)) {
+      return;
     }
+    this.entries = this.entries.filter(e => e.id !== id);
+    this.saveData();
+    this.showToast(`Deleted ${item.name}`);
   }
 
   /* ================= BROWSER GEOLOCATION ================= */
-  // Usable in both Add and Edit forms
   useCurrentLocation() {
     if (!navigator.geolocation) {
       alert('Browser geolocation is not supported.');
@@ -768,12 +1064,6 @@ class GreenMetricaApp {
         );
         this.renderTable();
       });
-    }
-
-    // Import file input listener
-    const importInput = document.getElementById('importFileInput');
-    if (importInput) {
-      importInput.addEventListener('change', (e) => this.handleImportFile(e));
     }
 
     // Form live preview inputs

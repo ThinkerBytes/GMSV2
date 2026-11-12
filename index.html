@@ -17,6 +17,10 @@
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- SheetJS for Client-Side Excel Import/Export -->
+  <script src="xlsx.full.min.js"></script>
+  <script>if (typeof XLSX === 'undefined') document.write('<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"><\/script>');</script>
+
   <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -43,22 +47,27 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex items-center gap-2.5">
+      <div class="flex items-center gap-2 sm:gap-2.5">
         
-        <!-- Hidden file input for importing JSON -->
-        <input type="file" id="importFileInput" accept=".json" class="hidden">
-        
-        <button onclick="document.getElementById('importFileInput').click()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
-          <i class="fas fa-file-import text-slate-500"></i> Import Data
+        <!-- Excel Import Button -->
+        <button onclick="window.GreenMetricaApp.openImportExcelModal()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200 shadow-xs">
+          <i class="fas fa-file-excel text-emerald-600"></i> <span class="hidden sm:inline">Import</span> Data
         </button>
 
-        <button onclick="window.GreenMetricaApp.exportData()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
-          <i class="fas fa-file-export text-slate-500"></i> Export Data
+        <!-- Excel Export Button -->
+        <button onclick="window.GreenMetricaApp.exportExcel()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200 shadow-xs">
+          <i class="fas fa-file-arrow-down text-emerald-600"></i> <span class="hidden sm:inline">Export</span> Data
         </button>
 
-        <button onclick="window.GreenMetricaApp.openAddModal()" class="text-xs font-bold px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
-          <i class="fas fa-plus"></i> Add Entry
+        <!-- Add Entry Button -->
+        <button onclick="window.GreenMetricaApp.openAddModal()" class="text-xs font-bold px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
+          <i class="fas fa-plus"></i> <span class="hidden xs:inline">Add</span> Entry
         </button>
+
+        <!-- Admin Page Link -->
+        <a href="admin.html" class="text-xs font-semibold px-2.5 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-600 hover:text-slate-900 transition flex items-center gap-1 border border-slate-200" title="Admin & JSON Management">
+          <i class="fas fa-gear text-slate-500"></i> <span class="hidden sm:inline">Admin</span>
+        </a>
 
       </div>
 
@@ -230,6 +239,69 @@
 
   </main>
 
+  <!-- ================= EXCEL IMPORT MODAL ================= -->
+  <div id="excelImportModal" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-xs hidden overflow-y-auto p-4 sm:p-6">
+    <div class="relative mx-auto my-8 sm:my-14 max-w-lg w-full bg-white border border-slate-200 rounded-2xl p-6 shadow-2xl text-slate-800 space-y-4">
+      
+      <!-- Close button -->
+      <button onclick="window.GreenMetricaApp.closeImportExcelModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1.5 rounded-lg hover:bg-slate-100 transition">
+        <i class="fas fa-times text-base"></i>
+      </button>
+
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
+          <i class="fas fa-file-excel text-lg"></i>
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-slate-900">Import Student Data from Excel</h3>
+          <p class="text-xs text-slate-500">Upload an Excel spreadsheet (.xlsx, .xls) to populate records and map coordinates.</p>
+        </div>
+      </div>
+
+      <!-- Sample Template Download Card (Exactly as requested) -->
+      <div class="p-4 rounded-xl bg-emerald-50/70 border border-emerald-200 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-emerald-900 flex items-center gap-1.5">
+            <i class="fas fa-table text-emerald-600"></i> Sample Excel Template
+          </span>
+          <button type="button" onclick="window.GreenMetricaApp.downloadExcelTemplate()" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-xs">
+            <i class="fas fa-download"></i> Download Sample Excel
+          </button>
+        </div>
+        <p class="text-[11px] text-emerald-800 leading-relaxed">
+          Pre-populated with the 25 current students, including coordinates and parameter columns. You can add more students to this file and upload it.
+        </p>
+      </div>
+
+      <!-- File Upload Dropzone -->
+      <div class="border-2 border-dashed border-slate-300 hover:border-emerald-500 rounded-xl p-5 text-center transition cursor-pointer bg-slate-50 hover:bg-emerald-50/30" onclick="document.getElementById('excelFileInput').click()">
+        <input type="file" id="excelFileInput" accept=".xlsx, .xls" class="hidden" onchange="window.GreenMetricaApp.handleExcelFileSelect(event)">
+        <i class="fas fa-cloud-arrow-up text-2xl text-slate-400 mb-2"></i>
+        <div class="text-xs font-semibold text-slate-700">Click to browse or drop Excel file here</div>
+        <div class="text-[11px] text-slate-500 mt-0.5">Supports Microsoft Excel (.xlsx, .xls)</div>
+      </div>
+
+      <!-- Selected File Preview -->
+      <div id="excelFilePreview" class="hidden p-3 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2 text-slate-800 font-medium">
+          <i class="fas fa-file-excel text-emerald-600 text-base"></i>
+          <span id="excelPreviewFilename" class="truncate max-w-[200px]">file.xlsx</span>
+        </div>
+        <span id="excelPreviewRowCount" class="text-xs text-slate-500 font-mono">0 rows</span>
+      </div>
+
+      <div class="pt-3 border-t border-slate-200 flex justify-end gap-2.5">
+        <button type="button" onclick="window.GreenMetricaApp.closeImportExcelModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-medium transition">
+          Cancel
+        </button>
+        <button id="btnConfirmExcelImport" type="button" disabled onclick="window.GreenMetricaApp.confirmExcelImport()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg text-xs font-bold transition shadow-xs flex items-center gap-1.5">
+          <i class="fas fa-check"></i> Import & Plot on Map
+        </button>
+      </div>
+
+    </div>
+  </div>
+
   <!-- ================= ADD / EDIT MODAL ================= -->
   <!-- Top gap ensured with outer p-4 sm:p-6 and inner my-8 sm:my-12 -->
   <div id="entryModal" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-xs hidden overflow-y-auto p-4 sm:p-6">
@@ -307,11 +379,11 @@
           <div class="grid grid-cols-2 gap-3 font-mono">
             <div>
               <span class="text-[10px] text-slate-500 font-sans block mb-0.5">Latitude:</span>
-              <input id="userLat" type="number" step="0.0001" required placeholder="e.g. 10.7867" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs">
+              <input id="userLat" type="number" step="0.0001" required placeholder="e.g. 10.9069" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs">
             </div>
             <div>
               <span class="text-[10px] text-slate-500 font-sans block mb-0.5">Longitude:</span>
-              <input id="userLng" type="number" step="0.0001" required placeholder="e.g. 76.6548" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs">
+              <input id="userLng" type="number" step="0.0001" required placeholder="e.g. 76.4094" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-slate-900 text-xs">
             </div>
           </div>
         </div>

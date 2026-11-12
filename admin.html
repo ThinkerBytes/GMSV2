@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenMetrica - Administration & Raw Database</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-[1100] shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-slate-800 flex items-center justify-center text-white shadow-sm shadow-slate-800/20">
+          <i class="fas fa-database text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">Green<span class="text-emerald-600">Metrica</span></span>
+          <span class="ml-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 border border-slate-300">
+            Admin Console
+          </span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2.5">
+        <a href="index.html" class="text-xs font-semibold px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm shadow-emerald-600/30">
+          <i class="fas fa-arrow-left"></i> Return to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTENT ================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-grow w-full space-y-7">
+
+    <!-- OVERVIEW STATS -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      
+      <div class="card-pop rounded-2xl p-5 border-t-4 border-t-slate-700">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Records</div>
+        <div id="adminRecordCount" class="text-3xl font-extrabold text-slate-900 font-mono">--</div>
+        <p class="text-xs text-slate-500 mt-2">Active in localStorage</p>
+      </div>
+
+      <div class="card-pop rounded-2xl p-5 border-t-4 border-t-emerald-500">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Total Footprint</div>
+        <div id="adminTotalEmissions" class="text-2xl font-extrabold text-slate-900 font-mono">--</div>
+        <p class="text-xs text-slate-500 mt-2">Sum of reported net emissions</p>
+      </div>
+
+      <div class="card-pop rounded-2xl p-5 border-t-4 border-t-sky-500">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Average per Record</div>
+        <div id="adminAvgEmissions" class="text-2xl font-extrabold text-slate-900 font-mono">--</div>
+        <p class="text-xs text-slate-500 mt-2">Monthly per student</p>
+      </div>
+
+      <div class="card-pop rounded-2xl p-5 border-t-4 border-t-amber-500">
+        <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1">Storage Version</div>
+        <div class="text-lg font-extrabold text-slate-900 font-mono mt-1">greenmetrica_v7</div>
+        <p class="text-xs text-slate-500 mt-2">Centered: 10.9069, 76.4094</p>
+      </div>
+
+    </div>
+
+    <!-- DATA MANAGEMENT CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+      <!-- JSON EXPORT -->
+      <div class="card-pop rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center">
+            <i class="fas fa-file-code text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Full Database JSON Export</h3>
+            <p class="text-xs text-slate-500">Download complete dataset including all raw and calculated parameters</p>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Creates a comprehensive JSON file containing every student record, geographic coordinates, itemized consumption values, and calculated emission breakdowns.
+        </p>
+        <div class="pt-2">
+          <button onclick="window.GreenMetricaAdmin.exportJSON()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-2 shadow-sm shadow-emerald-600/30">
+            <i class="fas fa-download"></i> Download Full JSON Backup
+          </button>
+        </div>
+      </div>
+
+      <!-- JSON RESTORE -->
+      <div class="card-pop rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center">
+            <i class="fas fa-cloud-arrow-up text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Restore Database from JSON</h3>
+            <p class="text-xs text-slate-500">Import a previously saved JSON backup to replace active database</p>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Upload an existing GreenMetrica JSON backup file. The system validates all coordinates, recalculates emissions, and updates the active dataset.
+        </p>
+        <div class="pt-2">
+          <input type="file" id="adminJsonFileInput" accept=".json" class="hidden">
+          <button onclick="document.getElementById('adminJsonFileInput').click()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 transition flex items-center gap-2">
+            <i class="fas fa-folder-open text-slate-500"></i> Select & Restore JSON Backup
+          </button>
+        </div>
+      </div>
+
+      <!-- RESET TO DEFAULT -->
+      <div class="card-pop rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center">
+            <i class="fas fa-rotate-left text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Reset to Default Dataset</h3>
+            <p class="text-xs text-slate-500">Restore the 25 verified student records centered around (10.9069, 76.4094)</p>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Resets the browser storage back to the original 25 student records from the Green Metrica summary with authentic randomized community coordinates.
+        </p>
+        <div class="pt-2">
+          <button onclick="window.GreenMetricaAdmin.resetToDefaultData()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white transition flex items-center gap-2 shadow-sm shadow-amber-500/30">
+            <i class="fas fa-arrows-rotate"></i> Reset to 25 Default Records
+          </button>
+        </div>
+      </div>
+
+      <!-- CLEAR ALL -->
+      <div class="card-pop rounded-2xl p-6 space-y-3">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center">
+            <i class="fas fa-triangle-exclamation text-lg"></i>
+          </div>
+          <div>
+            <h3 class="font-bold text-base text-slate-900">Clear All Database Records</h3>
+            <p class="text-xs text-slate-500">Permanently empty all student records from local storage</p>
+          </div>
+        </div>
+        <p class="text-xs text-slate-600 leading-relaxed">
+          Completely clears all entries. Useful when preparing to import a new independent cohort via the Excel Import workflow on the home page.
+        </p>
+        <div class="pt-2">
+          <button onclick="window.GreenMetricaAdmin.clearAllData()" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white transition flex items-center gap-2 shadow-sm shadow-rose-600/30">
+            <i class="fas fa-trash"></i> Clear Database
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- LIVE DATABASE INSPECTOR -->
+    <div class="card-pop rounded-2xl p-6 space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+            <i class="fas fa-table-list text-emerald-600"></i> Active Database Entries
+          </h3>
+          <p id="adminTableCount" class="text-xs text-slate-500">Loading records...</p>
+        </div>
+        
+        <!-- Search -->
+        <div class="relative w-full sm:w-64">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+          <input id="adminSearchInput" type="text" placeholder="Filter by name or class..." class="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+      <div class="overflow-x-auto rounded-xl border border-slate-200">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
+              <th class="py-3 px-3">#</th>
+              <th class="py-3 px-3">Name</th>
+              <th class="py-3 px-3">Class</th>
+              <th class="py-3 px-3">Coordinates (Lat, Lng)</th>
+              <th class="py-3 px-3">Net Emission</th>
+              <th class="py-3 px-3">Tier</th>
+              <th class="py-3 px-3 text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="adminTableBody" class="divide-y divide-slate-100">
+            <!-- Populated via admin.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-4 right-4 z-[10000] hidden bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition"></div>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
+    GreenMetrica Administration &bull; JSON Data Hub &amp; Storage Utilities
+  </footer>
+
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+
+</body>
+</html>
