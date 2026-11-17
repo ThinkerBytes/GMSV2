@@ -26,6 +26,61 @@ class GreenMetricaApp {
     this.updateDashboard();
     this.renderCharts();
     this.renderTable();
+
+    // Check URL hash: open dashboard if #dashboard, otherwise default to landing page
+    if (window.location.hash === '#dashboard') {
+      this.showDashboard();
+    } else {
+      this.showLanding();
+    }
+  }
+
+  /* ================= VIEW NAVIGATION (LANDING & DASHBOARD) ================= */
+  showDashboard() {
+    const landing = document.getElementById('landingView');
+    const dashboard = document.getElementById('dashboardView');
+    const navDashboard = document.getElementById('navDashboardActions');
+    const navLanding = document.getElementById('navLandingActions');
+    const footer = document.getElementById('appFooter');
+
+    if (landing) landing.classList.add('hidden');
+    if (dashboard) dashboard.classList.remove('hidden');
+    if (navDashboard) navDashboard.classList.remove('hidden');
+    if (navLanding) navLanding.classList.add('hidden');
+    if (footer) footer.classList.remove('hidden');
+
+    window.location.hash = 'dashboard';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Invalidate map size so Leaflet renders full dimensions immediately
+    if (this.map) {
+      setTimeout(() => {
+        this.map.invalidateSize();
+        if (this.entries && this.entries.length > 0) {
+          const bounds = this.entries.map(e => [e.lat, e.lng]);
+          try {
+            this.map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+          } catch (e) {}
+        }
+      }, 100);
+    }
+  }
+
+  showLanding() {
+    const landing = document.getElementById('landingView');
+    const dashboard = document.getElementById('dashboardView');
+    const navDashboard = document.getElementById('navDashboardActions');
+    const navLanding = document.getElementById('navLandingActions');
+    const footer = document.getElementById('appFooter');
+
+    if (landing) landing.classList.remove('hidden');
+    if (dashboard) dashboard.classList.add('hidden');
+    if (navDashboard) navDashboard.classList.add('hidden');
+    if (navLanding) navLanding.classList.remove('hidden');
+    if (footer) footer.classList.add('hidden');
+
+    window.location.hash = 'home';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
   /* ================= LOCAL STORAGE & CACHE ================= */
@@ -1078,6 +1133,15 @@ class GreenMetricaApp {
       if (el) {
         el.addEventListener('input', () => this.updateFormLivePreview());
         el.addEventListener('change', () => this.updateFormLivePreview());
+      }
+    });
+
+    // Hash change routing (Back/Forward browser buttons)
+    window.addEventListener('hashchange', () => {
+      if (window.location.hash === '#dashboard') {
+        this.showDashboard();
+      } else {
+        this.showLanding();
       }
     });
 

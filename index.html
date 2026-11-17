@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GreenMetrica - Carbon Footprint Calculator & Geospatial Tracker</title>
+  <title>GreenMetrica - Net-Zero Carbon Calculator & Geospatial Tracker</title>
   
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
 
@@ -33,22 +33,48 @@
   <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-[1100] shadow-xs">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
       
-      <!-- Brand Logo -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm shadow-emerald-600/30">
+      <!-- Brand Logo (Clicking returns to Landing Page) -->
+      <div onclick="window.GreenMetricaApp.showLanding()" class="flex items-center gap-3 cursor-pointer select-none group">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm shadow-emerald-600/30 group-hover:bg-emerald-500 transition">
           <i class="fas fa-leaf text-lg"></i>
         </div>
         <div>
           <span class="text-xl font-extrabold tracking-tight text-slate-900">Green<span class="text-emerald-600">Metrica</span></span>
           <span class="hidden md:inline-block ml-2 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>Live Monitoring
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1 animate-pulse"></span>Net-Zero
           </span>
         </div>
       </div>
 
-      <!-- Action Buttons -->
-      <div class="flex items-center gap-2 sm:gap-2.5">
+      <!-- Action Buttons for Landing View -->
+      <div id="navLandingActions" class="flex items-center gap-3">
+        <nav class="flex items-center gap-4 text-xs font-semibold text-slate-600">
+          <a href="docs.html" class="hover:text-emerald-600 transition flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-slate-100">
+            <i class="fas fa-book-open text-emerald-600"></i> Docs
+          </a>
+          <a href="admin.html" class="hover:text-slate-900 transition flex items-center gap-1.5 py-1 px-2.5 rounded-lg hover:bg-slate-100 text-slate-500">
+            <i class="fas fa-gear text-slate-400"></i> Admin
+          </a>
+        </nav>
+        <button onclick="window.GreenMetricaApp.showDashboard()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg transition flex items-center gap-1.5 shadow-xs cursor-pointer">
+          <span>Go to Dashboard</span>
+          <i class="fas fa-arrow-right text-xs"></i>
+        </button>
+      </div>
+
+      <!-- Action Buttons for Dashboard View -->
+      <div id="navDashboardActions" class="hidden flex items-center gap-2 sm:gap-2.5">
         
+        <!-- Return to Landing / Home Button -->
+        <button onclick="window.GreenMetricaApp.showLanding()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200 shadow-xs" title="Return to Landing Page">
+          <i class="fas fa-house text-emerald-600"></i> <span class="hidden sm:inline">Home</span>
+        </button>
+
+        <!-- Documentation Link -->
+        <a href="docs.html" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200 shadow-xs" title="View Net-Zero Framework & Methodology Documentation">
+          <i class="fas fa-book-open text-emerald-600"></i> <span class="hidden sm:inline">Docs</span>
+        </a>
+
         <!-- Excel Import Button -->
         <button onclick="window.GreenMetricaApp.openImportExcelModal()" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200 shadow-xs">
           <i class="fas fa-file-excel text-emerald-600"></i> <span class="hidden sm:inline">Import</span> Data
@@ -74,8 +100,105 @@
     </div>
   </header>
 
-  <!-- ================= MAIN CONTENT ================= -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-grow w-full space-y-7">
+  <!-- ============================================================== -->
+  <!-- 1. LANDING PAGE VIEW (Clean & Professional App Landing Page)    -->
+  <!-- ============================================================== -->
+  <div id="landingView" class="w-full min-h-[calc(100vh-4rem)] flex flex-col justify-between bg-slate-50 select-none">
+
+    <!-- Center Hero Section (Vertically Centered) -->
+    <div class="flex-grow flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 py-10 max-w-4xl mx-auto text-center">
+      
+      <!-- Professional Badge -->
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs mb-5">
+        <span class="w-2 h-2 rounded-full bg-emerald-600"></span>
+        <span>Institutional Decarbonization Platform</span>
+      </div>
+
+      <!-- Main Heading -->
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 leading-tight max-w-3xl">
+        Campus Carbon Footprint &amp; <span class="text-emerald-600">Net-Zero</span> Intelligence
+      </h1>
+
+      <!-- Description -->
+      <p class="text-sm sm:text-base text-slate-600 max-w-2xl mx-auto leading-relaxed mt-4 mb-8">
+        Quantify consumption emissions, analyze commuting patterns on an interactive geospatial map, and monitor institutional progress toward sustainability benchmarks.
+      </p>
+
+      <!-- Centered Primary CTA Button -->
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-3.5 mb-10">
+        <button onclick="window.GreenMetricaApp.showDashboard()" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl font-bold text-sm sm:text-base shadow-sm transition-all flex items-center justify-center gap-2.5 cursor-pointer">
+          <i class="fas fa-chart-pie"></i>
+          <span>Go to Dashboard</span>
+          <i class="fas fa-arrow-right text-xs"></i>
+        </button>
+        
+      </div>
+
+      <!-- 3 Professional Feature Pillars -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full max-w-3xl text-left">
+        
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs shrink-0 mt-0.5">
+            <i class="fas fa-calculator"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-900">Standardized CFPC Factors</div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Electricity, fuel, diet, and circular offset accounting.</p>
+          </div>
+        </div>
+
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-sky-50 text-sky-600 flex items-center justify-center text-xs shrink-0 mt-0.5">
+            <i class="fas fa-map-location-dot"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-900">Geospatial Pin Mapping</div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Zero-API Leaflet clustering of community emissions.</p>
+          </div>
+        </div>
+
+        <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-2xs flex items-start gap-3">
+          <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-700 flex items-center justify-center text-xs shrink-0 mt-0.5">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div>
+            <div class="text-xs font-bold text-slate-900">Excel Bulk Ingestion</div>
+            <p class="text-[11px] text-slate-500 mt-0.5">Instant client-side template download and data parsing.</p>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Professional Footer Bar for Landing Page -->
+    <footer class="w-full border-t border-slate-200 bg-white py-4 px-4 sm:px-8">
+      <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-2.5">
+        <div class="flex items-center gap-2">
+          <div class="w-5 h-5 rounded-md bg-emerald-600 flex items-center justify-center text-white text-[10px]">
+            <i class="fas fa-leaf"></i>
+          </div>
+          <span class="font-bold text-slate-800">GreenMetrica</span>
+          <span>&bull;</span>
+          <span>Campus Decarbonization &amp; Geospatial Tracking Platform</span>
+        </div>
+        <div class="flex items-center gap-5 text-xs text-slate-600 font-medium">
+          <a href="docs.html" class="hover:text-emerald-600 transition flex items-center gap-1.5">
+            <i class="fas fa-book-open text-slate-400"></i> Documentation
+          </a>
+          <a href="admin.html" class="hover:text-emerald-600 transition flex items-center gap-1.5">
+            <i class="fas fa-gear text-slate-400"></i> Admin
+          </a>
+        </div>
+      </div>
+    </footer>
+
+  </div>
+
+  <!-- ============================================================== -->
+  <!-- 2. DASHBOARD VIEW (Full Interactive Dashboard)                  -->
+  <!-- ============================================================== -->
+  <main id="dashboardView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-7 flex-grow w-full space-y-7">
 
     <!-- TOP 3 ANALYTICS CARDS (Styled to Pop Out) -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -495,9 +618,19 @@
   <!-- Toast Notification -->
   <div id="toast" class="fixed bottom-4 right-4 z-[10000] hidden bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg transition"></div>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 py-4 text-center text-xs text-slate-500">
-    GreenMetrica &bull; Carbon Footprint Calculator & Geospatial Tracker
+  <!-- ================= FOOTER ================= -->
+  <footer id="appFooter" class="hidden bg-white border-t border-slate-200 py-8 text-center text-xs text-slate-500 space-y-2">
+    <div class="flex items-center justify-center gap-2">
+      <div class="w-6 h-6 rounded-lg bg-emerald-600 flex items-center justify-center text-white text-xs">
+        <i class="fas fa-leaf"></i>
+      </div>
+      <span class="font-bold text-slate-800">GreenMetrica</span>
+      <span>&bull;</span>
+      <span>Decarbonization Platform &amp; Geospatial Emissions Tracker</span>
+    </div>
+    <p class="text-slate-400 text-[11px]">
+      Promoting institutional Net-Zero targets, active carbon reductions, and sustainable community energy transitions.
+    </p>
   </footer>
 
   <script src="data.js"></script>

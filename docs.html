@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GreenMetrica Documentation - Net-Zero Framework & Methodology</title>
+  
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌱</text></svg>">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col font-sans antialiased">
+
+  <!-- ================= NAVBAR ================= -->
+  <header class="bg-white/95 backdrop-blur-md border-b border-slate-200/90 sticky top-0 z-[1100] shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Brand Logo -->
+      <a href="index.html" class="flex items-center gap-3 group">
+        <div class="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm shadow-emerald-600/30 group-hover:bg-emerald-500 transition">
+          <i class="fas fa-leaf text-lg"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900">Green<span class="text-emerald-600">Metrica</span></span>
+          <span class="ml-2 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
+            Documentation
+          </span>
+        </div>
+      </a>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
+          <i class="fas fa-house text-emerald-600"></i> Home
+        </a>
+        <a href="admin.html" class="text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 border border-slate-200">
+          <i class="fas fa-gear text-slate-500"></i> Admin
+        </a>
+        <a href="index.html#dashboard" class="btn-netzero-primary text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm">
+          <i class="fas fa-chart-pie"></i> Go to Dashboard
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN DOCS CONTENT ================= -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full space-y-12">
+
+    <!-- HERO INTRO -->
+    <div class="space-y-4 text-center max-w-3xl mx-auto">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-bold sustain-badge">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>Institutional Sustainability &bull; Net-Zero Technical Guide</span>
+      </div>
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight leading-tight">
+        The GreenMetrica <span class="text-emerald-600">Net-Zero</span> Framework
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 leading-relaxed">
+        A comprehensive guide to empirical emissions calculations, geospatial community mapping, and data-driven decarbonization roadmaps for educational and community institutions.
+      </p>
+    </div>
+
+    <!-- THREE CORE PILLARS -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <i class="fas fa-landmark text-emerald-600"></i> Three Pillars of Decarbonization
+        </h2>
+        <p class="text-xs text-slate-500 mt-1">Our scientific methodology bridges personal accounting with institutional action.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <div class="card-pop rounded-2xl p-5 border-t-4 border-t-emerald-500 space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+            <i class="fas fa-scale-balanced"></i>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900">1. Precision Carbon Accounting</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Direct consumption of grid electricity, vehicle fuels, cooking gas, and dietary choices are quantified using empirical factors in standardized kg CO₂e units.
+          </p>
+        </div>
+
+        <div class="card-pop rounded-2xl p-5 border-t-4 border-t-sky-500 space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center text-lg">
+            <i class="fas fa-map-location-dot"></i>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900">2. Geospatial Hotspot Identification</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Regional emissions cluster along commute corridors. Visual pin plotting reveals neighborhood density zones to prioritize carpooling and bus transit routes.
+          </p>
+        </div>
+
+        <div class="card-pop rounded-2xl p-5 border-t-4 border-t-amber-500 space-y-2.5">
+          <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg">
+            <i class="fas fa-arrows-spin"></i>
+          </div>
+          <h3 class="font-bold text-sm text-slate-900">3. Active Reduction &amp; Circular Offsets</h3>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            Residual footprints are actively balanced through solar generation credits and circular recycling offsets (-0.50 kg CO₂e/kg) to reach Net-Zero thresholds.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- THE NET-ZERO EQUATION & TIERS -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <i class="fas fa-calculator text-emerald-600"></i> The Net-Zero Carbon Balance Equation
+        </h2>
+        <p class="text-xs text-slate-500 mt-1">Mathematical formula governing total institutional and student carbon footprints.</p>
+      </div>
+
+      <!-- Formula Box -->
+      <div class="card-pop rounded-2xl p-6 bg-gradient-to-r from-emerald-50/50 via-white to-sky-50/50 border border-emerald-200/80">
+        <div class="text-center space-y-2 font-mono">
+          <div class="text-sm sm:text-base font-extrabold text-slate-900">
+            Net Emission (kg CO₂e) = &sum; Gross Emissions &minus; (&sum; Recycled kg &times; 0.50)
+          </div>
+          <p class="text-xs text-slate-500 font-sans">
+            Where Gross Emissions = Electricity + Car Fuel + Bike Fuel + LPG + Meat Diet + Dairy + Other Food + Waste Generation.
+          </p>
+        </div>
+      </div>
+
+      <!-- 3 Tiers -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        
+        <div class="p-5 rounded-2xl border border-emerald-200 bg-emerald-50/50 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-emerald-800 uppercase">&bull; Eco Champion</span>
+            <span class="text-xs font-mono font-bold text-emerald-700">&lt; 350 kg CO₂e</span>
+          </div>
+          <p class="text-xs text-slate-600">
+            Solar electricity users, low vehicle commute, active cycling or public transit, high waste recycling, and climate-conscious diet.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-amber-200 bg-amber-50/50 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-amber-800 uppercase">&bull; Moderate Emitter</span>
+            <span class="text-xs font-mono font-bold text-amber-700">350 - 600 kg CO₂e</span>
+          </div>
+          <p class="text-xs text-slate-600">
+            Typical household footprint with standard grid electricity dependency, moderate motor fuel usage, and average waste generation.
+          </p>
+        </div>
+
+        <div class="p-5 rounded-2xl border border-rose-200 bg-rose-50/50 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-rose-800 uppercase">&bull; High Emitter</span>
+            <span class="text-xs font-mono font-bold text-rose-700">&gt; 600 kg CO₂e</span>
+          </div>
+          <p class="text-xs text-slate-600">
+            Elevated car fuel combustion, high grid electricity usage without solar mitigation, and zero or minimal material recycling.
+          </p>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- CFPC CONVERSION METHODOLOGY TABLE -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <i class="fas fa-table text-emerald-600"></i> Standardized CFPC Conversion Factors
+        </h2>
+        <p class="text-xs text-slate-500 mt-1">Empirical coefficients derived from the Carbon FootPrint Calculator (CFPC) repository.</p>
+      </div>
+
+      <div class="card-pop rounded-2xl overflow-hidden border border-slate-200 shadow-xs">
+        <table class="w-full text-left text-xs border-collapse">
+          <thead>
+            <tr class="bg-slate-50 text-slate-600 font-semibold uppercase tracking-wider border-b border-slate-200">
+              <th class="py-3 px-4">Parameter</th>
+              <th class="py-3 px-4">Unit</th>
+              <th class="py-3 px-4">Emission Factor</th>
+              <th class="py-3 px-4">Scientific Basis</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 font-mono">
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Grid Electricity</td>
+              <td class="py-3 px-4 text-slate-500">kWh</td>
+              <td class="py-3 px-4 text-emerald-600 font-bold">0.50 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Subcontinental thermal grid average emission factor</td>
+            </tr>
+            <tr class="hover:bg-slate-50 bg-emerald-50/30">
+              <td class="py-3 px-4 font-sans font-semibold text-emerald-900">Solar Electricity</td>
+              <td class="py-3 px-4 text-slate-500">kWh</td>
+              <td class="py-3 px-4 text-emerald-700 font-bold">0.05 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-emerald-800">90% reduction credit via rooftop photovoltaic adoption</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Car Travel (Petrol)</td>
+              <td class="py-3 px-4 text-slate-500">Liters</td>
+              <td class="py-3 px-4 text-sky-600 font-bold">2.31 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Direct fuel liters or computed via (distance &divide; mileage)</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Car Travel (Diesel)</td>
+              <td class="py-3 px-4 text-slate-500">Liters</td>
+              <td class="py-3 px-4 text-sky-600 font-bold">2.68 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Higher hydrocarbon density combustion factor</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Bike Travel</td>
+              <td class="py-3 px-4 text-slate-500">Liters</td>
+              <td class="py-3 px-4 text-emerald-600 font-bold">2.31 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Motorcycle/scooter gasoline combustion</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">LPG Cooking Gas</td>
+              <td class="py-3 px-4 text-slate-500">kg</td>
+              <td class="py-3 px-4 text-amber-600 font-bold">2.983 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Domestic liquefied petroleum gas cylinder combustion</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Meat Consumption</td>
+              <td class="py-3 px-4 text-slate-500">kg</td>
+              <td class="py-3 px-4 text-rose-600 font-bold">10.30 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Agricultural land-use, feedlot, and livestock emissions</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Dairy Consumption</td>
+              <td class="py-3 px-4 text-slate-500">kg / L</td>
+              <td class="py-3 px-4 text-amber-600 font-bold">3.20 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Bovine processing and refrigerated supply chain footprint</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="py-3 px-4 font-sans font-semibold text-slate-900">Solid Waste</td>
+              <td class="py-3 px-4 text-slate-500">kg</td>
+              <td class="py-3 px-4 text-slate-600 font-bold">0.45 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-slate-600">Anaerobic landfill decomposition and methane potential</td>
+            </tr>
+            <tr class="hover:bg-slate-50 bg-emerald-50/40">
+              <td class="py-3 px-4 font-sans font-semibold text-emerald-900">Material Recycling</td>
+              <td class="py-3 px-4 text-slate-500">kg</td>
+              <td class="py-3 px-4 text-emerald-600 font-bold">-0.50 kg CO₂e</td>
+              <td class="py-3 px-4 font-sans text-emerald-800">Avoided virgin resource extraction &amp; circular offset credit</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- EXCEL INGESTION FORMAT GUIDE -->
+    <section class="space-y-6">
+      <div class="border-b border-slate-200 pb-3">
+        <h2 class="text-xl font-bold text-slate-900 flex items-center gap-2">
+          <i class="fas fa-file-excel text-emerald-600"></i> Excel Bulk Ingestion Format
+        </h2>
+        <p class="text-xs text-slate-500 mt-1">How institutional administrators can prepare spreadsheets for instant bulk plotting.</p>
+      </div>
+
+      <div class="card-pop rounded-2xl p-6 space-y-3 bg-white">
+        <p class="text-xs text-slate-600 leading-relaxed">
+          The dashboard includes client-side Excel processing powered by SheetJS. To import data, use the downloadable template containing the following required columns:
+        </p>
+        <div class="flex flex-wrap gap-2 text-xs font-mono">
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">SL No</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Name</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Class</span>
+          <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">Latitude</span>
+          <span class="px-2.5 py-1 rounded-md bg-emerald-100 text-emerald-900 border border-emerald-300 font-bold">Longitude</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Electricity (kWh)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Solar</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Car Fuel (Liters)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Car Fuel Type</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Bike Fuel (Liters)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">LPG (kg)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Meat (kg)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Dairy (kg)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Solid Waste (kg)</span>
+          <span class="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 border border-slate-200">Recycling (kg)</span>
+        </div>
+        <p class="text-[11px] text-slate-500 pt-2">
+          Note: If coordinates are omitted in user spreadsheets, GreenMetrica automatically applies a gentle regional cluster around the central coordinates (10.9069, 76.4094).
+        </p>
+      </div>
+    </section>
+
+    <!-- CTA BANNER -->
+    <div class="card-pop rounded-3xl p-8 bg-gradient-to-r from-emerald-600 via-teal-700 to-slate-900 text-white text-center space-y-4 shadow-xl">
+      <h3 class="text-2xl sm:text-3xl font-extrabold tracking-tight">Ready to Explore the Live Emissions Dashboard?</h3>
+      <p class="text-xs sm:text-sm text-emerald-100 max-w-xl mx-auto">
+        Switch directly to the interactive map, benchmark cohort footprints, and run dynamic calculations.
+      </p>
+      <div class="pt-2">
+        <a href="index.html#dashboard" class="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl bg-white text-emerald-800 font-extrabold text-sm hover:bg-emerald-50 transition shadow-lg">
+          <i class="fas fa-chart-pie text-emerald-600"></i> Go to Dashboard <i class="fas fa-arrow-right text-xs"></i>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="bg-white border-t border-slate-200 py-6 text-center text-xs text-slate-500 space-y-1">
+    <div class="font-bold text-slate-800">GreenMetrica Documentation</div>
+    <p class="text-[11px] text-slate-400">Carbon Accounting Methodology &bull; Open-Source Geospatial Emissions Engine</p>
+  </footer>
+
+</body>
+</html>

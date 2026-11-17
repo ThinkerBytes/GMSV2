@@ -155,7 +155,32 @@ var INITIAL_STUDENT_DATA = [
   { id: 'gm-22', no: 22, name: 'ASHISH M', class: 'X E', lat: 10.9049, lng: 76.4175, car: 20, carFuelType: 'petrol', bike: 20, electricity: 207, lpg: 14.2, meat: 5, dairy: 25, otherFood: 25, waste: 15, recycling: 5 },
   { id: 'gm-23', no: 23, name: 'RIDHA', class: 'IX A', lat: 10.8972, lng: 76.4064, car: 8, carFuelType: 'petrol', bike: 10, electricity: 200, lpg: 14.2, meat: 10, dairy: 30, otherFood: 50, waste: 25, recycling: 10 },
   { id: 'gm-24', no: 24, name: 'VISHWAJITH V', class: 'XII A', lat: 10.9251, lng: 76.4275, car: 25, carFuelType: 'petrol', bike: 8, electricity: 300, lpg: 14.2, meat: 12, dairy: 12, otherFood: 25, waste: 30, recycling: 3 },
-  { id: 'gm-25', no: 25, name: 'VEDA K S', class: 'IX A', lat: 10.9074, lng: 76.3917, car: 20, carFuelType: 'petrol', bike: 18, electricity: 480, lpg: 14.2, meat: 6, dairy: 40, otherFood: 30, waste: 15, recycling: 7 }
+  { id: 'gm-25', no: 25, name: 'VEDA K S', class: 'IX A', lat: 10.9074, lng: 76.3917, car: 20, carFuelType: 'petrol', bike: 18, electricity: 480, lpg: 14.2, meat: 6, dairy: 40, otherFood: 30, waste: 15, recycling: 7 },
+  { id: 'gm-26', no: 26, name: 'ISHAN KRISHNA M', class: 'X B', lat: 10.9031, lng: 76.3982, car: 30, carFuelType: 'petrol', bike: 60, electricity: 320, lpg: 8, meat: 10, dairy: 33, otherFood: 30, waste: 14, recycling: 4 },
+  { id: 'gm-27', no: 27, name: 'MADHAVKRISHNA K', class: 'X B', lat: 10.9125, lng: 76.4011, car: 8, carFuelType: 'petrol', bike: 0, electricity: 120, lpg: 14.2, meat: 10, dairy: 15, otherFood: 30, waste: 6, recycling: 3 },
+  { id: 'gm-28', no: 28, name: 'ROBIN ROY', class: 'X B', lat: 10.8988, lng: 76.4155, car: 8, carFuelType: 'petrol', bike: 0, electricity: 625, lpg: 14.2, meat: 20, dairy: 15, otherFood: 30, waste: 6, recycling: 2 },
+  { id: 'gm-29', no: 29, name: 'AADIDEV S', class: 'X B', lat: 10.9201, lng: 76.3909, car: 10, carFuelType: 'petrol', bike: 8, electricity: 120, lpg: 14.2, meat: 12, dairy: 15, otherFood: 30, waste: 15, recycling: 2 },
+  { id: 'gm-30', no: 30, name: 'NANDANA S NAIR', class: 'X A', lat: 10.9056, lng: 76.4210, car: 35, carFuelType: 'petrol', bike: 15, electricity: 550, lpg: 14.2, meat: 6, dairy: 45, otherFood: 30, waste: 12, recycling: 6 },
+  { id: 'gm-31', no: 31, name: 'MEERA PREMAN', class: 'X A', lat: 10.8933, lng: 76.4055, car: 25, carFuelType: 'petrol', bike: 20, electricity: 0, solar: true, lpg: 14.2, meat: 5, dairy: 46, otherFood: 30, waste: 17, recycling: 5 },
+  { id: 'gm-32', no: 32, name: 'NIYA P', class: 'X B', lat: 10.9118, lng: 76.3888, car: 40, carFuelType: 'petrol', bike: 15, electricity: 280, lpg: 8, meat: 10, dairy: 30, otherFood: 30, waste: 17, recycling: 6 },
+  { id: 'gm-33', no: 33, name: 'PARVATHY PREM', class: 'X B', lat: 10.8995, lng: 76.4101, car: 30, carFuelType: 'petrol', bike: 15, electricity: 300, lpg: 8.1, meat: 3, dairy: 44, otherFood: 30, waste: 25, recycling: 4 },
+  { id: 'gm-34', no: 34, name: 'KEERTHI KRISHNA P', class: 'X B', lat: 10.9255, lng: 76.3965, car: 20, carFuelType: 'petrol', bike: 25, electricity: 200, lpg: 7.1, meat: 4, dairy: 45, otherFood: 30, waste: 20, recycling: 3 },
+  { id: 'gm-35', no: 35, name: 'ABHINAV K R', class: 'X B', lat: 10.9150, lng: 76.4250, car: 0, bike: 10, electricity: 120, lpg: 14.2, meat: 20, dairy: 20, otherFood: 30, waste: 20, recycling: 0 },
+  { id: 'gm-36', no: 36, name: 'ABHINAND A NAIR', class: 'X B', lat: 10.8912, lng: 76.4022, car: 8, carFuelType: 'petrol', bike: 7, electricity: 110, lpg: 14.2, meat: 10, dairy: 15, otherFood: 30, waste: 8, recycling: 6 },
+  { id: 'gm-37', no: 37, name: 'AKSHARA C', class: 'X B', lat: 10.9067, lng: 76.3855, car: 40, carFuelType: 'petrol', bike: 0, electricity: 300, lpg: 7.1, meat: 15, dairy: 40, otherFood: 30, waste: 19, recycling: 6 },
+  { id: 'gm-38', no: 38, name: 'P GANGA', class: 'X B', lat: 10.9222, lng: 76.4188, car: 0, bike: 75, electricity: 200, lpg: 8, meat: 22, dairy: 12, otherFood: 30, waste: 18, recycling: 0 },
+  { id: 'gm-39', no: 39, name: 'ALVIYA JOSHI', class: 'X B', lat: 10.8876, lng: 76.3999, car: 50, carFuelType: 'petrol', bike: 30, electricity: 400, lpg: 8, meat: 20, dairy: 12, otherFood: 30, waste: 18, recycling: 8 },
+  { id: 'gm-40', no: 40, name: 'ANUSHKA P', class: 'XB', lat: 10.9177, lng: 76.4077, car: 80, carFuelType: 'petrol', bike: 0, electricity: 0, solar: true, lpg: 8.2, meat: 15, dairy: 35, otherFood: 30, waste: 17, recycling: 6 },
+  { id: 'gm-41', no: 41, name: 'BHAVYA RAJ', class: 'X B', lat: 10.9011, lng: 76.3922, car: 60, carFuelType: 'petrol', bike: 0, electricity: 40, lpg: 14.2, meat: 0, dairy: 45, otherFood: 30, waste: 10, recycling: 5 },
+  { id: 'gm-42', no: 42, name: 'R PRITHICKSHA', class: 'X B', lat: 10.9244, lng: 76.4133, car: 50, carFuelType: 'petrol', bike: 11, electricity: 240, lpg: 14.2, meat: 8, dairy: 50, otherFood: 30, waste: 30, recycling: 10 },
+  { id: 'gm-43', no: 43, name: 'ARYANANDA V R', class: 'X B', lat: 10.8955, lng: 76.4288, car: 60, carFuelType: 'petrol', bike: 10, electricity: 400, lpg: 14.2, meat: 0, dairy: 45, otherFood: 30, waste: 30, recycling: 20 },
+  { id: 'gm-44', no: 44, name: 'ALTHARA K', class: 'X B', lat: 10.9088, lng: 76.3944, car: 50, carFuelType: 'petrol', bike: 30, electricity: 400, lpg: 14, meat: 5, dairy: 46, otherFood: 30, waste: 10, recycling: 10 },
+  { id: 'gm-45', no: 45, name: 'VAIBHAV C', class: 'X B', lat: 10.9199, lng: 76.4005, car: 8, carFuelType: 'petrol', bike: 10, electricity: 120.5, lpg: 14, meat: 10, dairy: 20, otherFood: 30, waste: 8, recycling: 10 },
+  { id: 'gm-46', no: 46, name: 'SREEDURGA M', class: 'X B', lat: 10.8899, lng: 76.4166, car: 42, carFuelType: 'petrol', bike: 15, electricity: 290, lpg: 8, meat: 12, dairy: 33, otherFood: 30, waste: 15, recycling: 6 },
+  { id: 'gm-47', no: 47, name: 'ARFAZ SULAIMAN', class: 'X B', lat: 10.9100, lng: 76.3899, car: 5, carFuelType: 'petrol', bike: 16, electricity: 650, lpg: 14.2, meat: 10, dairy: 18, otherFood: 30, waste: 20, recycling: 10 },
+  { id: 'gm-48', no: 48, name: 'ANUBAMA M', class: 'X B', lat: 10.9022, lng: 76.4202, car: 0, bike: 5, electricity: 330, lpg: 14.2, meat: 3, dairy: 45, otherFood: 30, waste: 6, recycling: 15 },
+  { id: 'gm-49', no: 49, name: 'SREENANDANA V', class: 'X C', lat: 10.9144, lng: 76.3955, car: 30, carFuelType: 'petrol', bike: 25, electricity: 550, lpg: 14.2, meat: 0, dairy: 46, otherFood: 30, waste: 15, recycling: 5 },
+  { id: 'gm-50', no: 50, name: 'ANANYA K S', class: 'X A', lat: 10.8966, lng: 76.4111, car: 30, carFuelType: 'petrol', bike: 15, electricity: 550, lpg: 15.6, meat: 10, dairy: 25, otherFood: 30, waste: 20, recycling: 7 }
 ];
 
 if (typeof window !== 'undefined') {
